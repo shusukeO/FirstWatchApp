@@ -38,12 +38,15 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
     private File file;
 
-    public static final int MAX_DATA = 500;
+    public static final int MAX_DATA = 1000;
     private float[][] sensorData = new float[3][MAX_DATA];
 
     Handler handler= new Handler();
 
     private boolean isSensorActive = false;
+
+    long startTime;
+    long endTime;
 
 
     @Override
@@ -112,6 +115,12 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 //            y = event.values[1];
 //            z = event.values[2];
 
+            if(count == 0){
+                startTime = System.currentTimeMillis();
+            }else if(count == MAX_DATA-1){
+                endTime = System.currentTimeMillis();
+            }
+
             if(count < MAX_DATA){
                 sensorData[0][count] = event.values[0];
                 sensorData[1][count] = event.values[1];
@@ -123,7 +132,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                 (new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        //ここで処理時間の長い処理を実行する
+                        //ファイルに書き出し
                         saveFile();
 
                         //スレッド終了後に「保存されました」と表示
@@ -150,7 +159,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         // 現在ストレージが書き込みできるかチェック
         if(isExternalStorageWritable()){
 
-            String str = "[";
+            String str = (endTime - startTime) + "ms(処理時間)" +"[";
 
             for(int i = 0; i < MAX_DATA; i++){
                 str += "{\"id\":" + i + ",\"x\":" + sensorData[0][i] + ",\"y\":" + sensorData[1][i] + ",\"z\":" + sensorData[2][i] + "}";
