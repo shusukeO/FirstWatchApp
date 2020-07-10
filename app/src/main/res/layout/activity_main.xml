@@ -30,6 +30,7 @@
                 android:layout_height="10dip"/>
 
             <Button
+                android:onClick="startFunc"
                 android:id="@+id/startButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

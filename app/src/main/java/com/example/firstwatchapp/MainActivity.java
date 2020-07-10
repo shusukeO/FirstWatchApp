@@ -12,6 +12,8 @@ import android.os.Environment;
 import android.os.Handler;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.io.BufferedWriter;
@@ -25,6 +27,7 @@ import java.util.List;
 public class MainActivity extends WearableActivity implements SensorEventListener, LocationListener {
 
     private TextView mTextView, textView;
+    private  Button startButton;
     String text = null;
     private SensorManager sensorManager;
     private Sensor sensor;
@@ -40,6 +43,8 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
     Handler handler= new Handler();
 
+    private boolean isSensorActive = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +58,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         mTextView = (TextView) findViewById(R.id.data);
         textView = findViewById(R.id.text);
+        startButton = findViewById(R.id.startButton);
 
         // Enables Always-on
         setAmbientEnabled();
@@ -62,7 +68,6 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         File path = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
         String datafile ="datafile.json";
         file = new File(path, datafile);
-
     }
 
     @Override
@@ -86,11 +91,20 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         sensorManager.unregisterListener(this);
     }
 
+    public void startFunc(View v){
+        if(!isSensorActive){
+            isSensorActive = true;
+            startButton.setText("計測中");
+            textView.setText("...");
+        }
+        Log.d("start button", "pushed");
+    }
+
     @Override
     public void onSensorChanged(SensorEvent event) {
 
 
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER && isSensorActive) {
             //x = (x * GAIN + event.values[0] * (1 - GAIN));
             //y = (y * GAIN + event.values[1] * (1 - GAIN));
             //z = (z * GAIN + event.values[2] * (1 - GAIN));
@@ -117,6 +131,9 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                             @Override
                             public void run() {
                                 textView.setText(text); // 画面に描画する処理
+                                startButton.setText("計測開始");
+                                isSensorActive = false;
+                                count = 0;
                             }
                         });
                     }
