@@ -48,6 +48,9 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     long startTime;
     long endTime;
 
+    //Postクラス
+    private UploadTask task;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +130,8 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                 sensorData[2][count] = event.values[2];
             }else if(count == MAX_DATA){
                 Log.d("saveFile", "データの保存開始！！ ");
+                postData();
+
 
                 //別スレッドで保存開始
                 (new Thread(new Runnable() {
@@ -153,6 +158,28 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 //            mTextView.setText(String.format("X : %f\nY : %f\nZ : %f" , x, y, z));
         }
 
+    }
+
+    private void postData(){
+
+        String param0 = (endTime - startTime) + "ms(処理時間)" +"[";
+
+        for(int i = 0; i < MAX_DATA; i++){
+            param0 += "{\"id\":" + i + ",\"x\":" + sensorData[0][i] + ",\"y\":" + sensorData[1][i] + ",\"z\":" + sensorData[2][i] + "}";
+            if(i != MAX_DATA -1){
+                param0 += ",";
+            }
+//                str += "x : " + sensorData[0][i] + ", y : " + sensorData[1][i] + ", z : " + sensorData[2][i] + "\n";
+        }
+
+        param0 += "]";
+//        String param0 = "test";
+
+        if(param0.length() != 0){
+            task = new UploadTask();
+            task.setListener(createListener());
+            task.execute(param0);
+        }
     }
 
     public void saveFile(){
@@ -196,7 +223,20 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         return (Environment.MEDIA_MOUNTED.equals(state));
     }
 
+    @Override
+    protected void onDestroy() {
+        task.setListener(null);
+        super.onDestroy();
+    }
 
+    private UploadTask.Listener createListener() {
+        return new UploadTask.Listener() {
+            @Override
+            public void onSuccess(String result) {
+//                textView.setText(result);
+            }
+        };
+    }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
