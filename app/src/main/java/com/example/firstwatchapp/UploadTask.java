@@ -35,7 +35,7 @@ public class UploadTask extends AsyncTask<String, Void, String> {
 
         HttpURLConnection httpConn = null;
         String result = null;
-        String word = "word="+params[0];
+//        String word = "word="+params[0];
 
         try{
             // URL設定
@@ -69,21 +69,26 @@ public class UploadTask extends AsyncTask<String, Void, String> {
 //                outStream.flush();
 //                Log.d("debug","flush");
 
-                HashMap<String, Object> jsonMap = new HashMap<>();
-                jsonMap.put("text" , "value");
-                ArrayList<String> array = new ArrayList<>();
-                array.add("array001");
-                array.add("array002");
-                array.add("array003");
-                jsonMap.put("array" , array);
-                if (jsonMap.size() > 0) {
-                    //JSON形式の文字列に変換する。
-                    JSONObject responseJsonObject = new JSONObject(jsonMap);
-                    String jsonText = responseJsonObject.toString();
-                    PrintStream ps = new PrintStream(httpConn.getOutputStream());
-                    ps.print(jsonText);
-                    ps.close();
-                }
+//                HashMap<String, Object> jsonMap = new HashMap<>();
+//                jsonMap.put("text" , "value");
+//                ArrayList<String> array = new ArrayList<>();
+//                array.add("array001");
+//                array.add("array002");
+//                array.add("array003");
+//                jsonMap.put("array" , array);
+//                if (jsonMap.size() > 0) {
+//                    //JSON形式の文字列に変換する。
+//                    JSONObject responseJsonObject = new JSONObject(jsonMap);
+//                    String jsonText = responseJsonObject.toString();
+//                    PrintStream ps = new PrintStream(httpConn.getOutputStream());
+//                    ps.print(jsonText);
+//                    ps.close();
+//                }
+
+                PrintStream ps = new PrintStream(httpConn.getOutputStream());
+                ps.print(params[0]);
+                ps.close();
+
                 outStream.close();
                 outStream.flush();
                 Log.d("debug","flush");
@@ -129,4 +134,5 @@ public class UploadTask extends AsyncTask<String, Void, String> {
     interface Listener {
         void onSuccess(String result);
     }
+    
 }

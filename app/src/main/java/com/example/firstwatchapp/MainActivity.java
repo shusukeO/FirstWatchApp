@@ -16,19 +16,23 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import org.json.JSONObject;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends WearableActivity implements SensorEventListener, LocationListener {
 
     private TextView mTextView, textView;
     private  Button startButton;
-    String text = null;
+    private String text = null;
     private SensorManager sensorManager;
     private Sensor sensor;
     int count = 0;
@@ -38,7 +42,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
     private File file;
 
-    public static final int MAX_DATA = 1000;
+    public static final int MAX_DATA = 100;
     private float[][] sensorData = new float[3][MAX_DATA];
 
     Handler handler= new Handler();
@@ -162,23 +166,28 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
     private void postData(){
 
-        String param0 = (endTime - startTime) + "ms(処理時間)" +"[";
+        HashMap<String, Object> jsonMap = new HashMap<>();
+        jsonMap.put("elapsedTime" , (endTime - startTime));
+
+        ArrayList<Object> array = new ArrayList<>();
 
         for(int i = 0; i < MAX_DATA; i++){
-            param0 += "{\"id\":" + i + ",\"x\":" + sensorData[0][i] + ",\"y\":" + sensorData[1][i] + ",\"z\":" + sensorData[2][i] + "}";
-            if(i != MAX_DATA -1){
-                param0 += ",";
-            }
-//                str += "x : " + sensorData[0][i] + ", y : " + sensorData[1][i] + ", z : " + sensorData[2][i] + "\n";
+            HashMap<String, Object> acceleration = new HashMap<>();
+            acceleration.put("id", i);
+            acceleration.put("x", sensorData[0][i]);
+            acceleration.put("y", sensorData[1][i]);
+            acceleration.put("z", sensorData[2][i]);
+            array.add(acceleration);
         }
+        jsonMap.put("acceleration" , array);
 
-        param0 += "]";
-//        String param0 = "test";
 
-        if(param0.length() != 0){
+        if (jsonMap.size() > 0) {
+            JSONObject responseJsonObject = new JSONObject(jsonMap);
+            String jsonText = responseJsonObject.toString();
             task = new UploadTask();
             task.setListener(createListener());
-            task.execute(param0);
+            task.execute(jsonText);
         }
     }
 
@@ -233,7 +242,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         return new UploadTask.Listener() {
             @Override
             public void onSuccess(String result) {
-//                textView.setText(result);
+                textView.setText(result);
             }
         };
     }
