@@ -5,7 +5,10 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.HttpURLConnection;
@@ -92,20 +95,23 @@ public class UploadTask extends AsyncTask<String, Void, String> {
                 outStream.close();
                 outStream.flush();
                 Log.d("debug","flush");
+
+                result = convertToString(httpConn.getInputStream());
+
             } catch (IOException e) {
                 // POST送信エラー
                 e.printStackTrace();
                 result = "POST送信エラー";
             }
 
-            final int status = httpConn.getResponseCode();
-            if (status == HttpURLConnection.HTTP_OK) {
-                // レスポンスを受け取る処理等
-                result="HTTP_OK";
-            }
-            else{
-                result="status="+String.valueOf(status);
-            }
+//            final int status = httpConn.getResponseCode();
+//            if (status == HttpURLConnection.HTTP_OK) {
+//                // レスポンスを受け取る処理等
+//                result="HTTP_OK";
+//            }
+//            else{
+//                result="status="+String.valueOf(status);
+//            }
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -134,5 +140,19 @@ public class UploadTask extends AsyncTask<String, Void, String> {
     interface Listener {
         void onSuccess(String result);
     }
-    
+
+    public String convertToString(InputStream stream) throws IOException {
+        StringBuffer sb = new StringBuffer();
+        String line = "";
+        BufferedReader br = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
+        while ((line = br.readLine()) != null) {
+            sb.append(line);
+        }
+        try {
+            stream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
+    }
 }
