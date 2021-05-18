@@ -24,7 +24,7 @@
                 android:id="@+id/data"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="瞬間の加速度データ" />
+                android:text="@string/title" />
 
             <Space android:layout_width="match_parent"
                 android:layout_height="10dip"/>

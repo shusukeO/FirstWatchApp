@@ -30,7 +30,7 @@ import java.util.List;
 
 public class MainActivity extends WearableActivity implements SensorEventListener, LocationListener {
 
-    private TextView mTextView, textView;
+    private TextView textView;
     private  Button startButton;
     private String text = null;
     private SensorManager sensorManager;
@@ -58,21 +58,28 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
 
-        geoSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR);
-
-        mTextView = (TextView) findViewById(R.id.data);
-        textView = findViewById(R.id.text);
-        startButton = findViewById(R.id.startButton);
-
         // Enables Always-on
         setAmbientEnabled();
 
+        geoSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR);
+
+        textView = findViewById(R.id.text);
+
+        startButton = findViewById(R.id.startButton);
+        startButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startFunc();
+            }
+        });
 
         //データ保存ファイル作成
         File path = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
@@ -101,7 +108,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         sensorManager.unregisterListener(this);
     }
 
-    public void startFunc(View v){
+    public void startFunc(){
         if(!isSensorActive){
             isSensorActive = true;
             startButton.setText("計測中");
@@ -133,10 +140,11 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                 sensorData[1][count] = event.values[1];
                 sensorData[2][count] = event.values[2];
             }else if(count == MAX_DATA){
-                Log.d("saveFile", "データの保存開始！！ ");
+
+                //データの送信
                 postData();
 
-
+                Log.d("saveFile", "データの保存開始！！ ");
                 //別スレッドで保存開始
                 (new Thread(new Runnable() {
                     @Override
@@ -159,7 +167,6 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
             }
             count++;
-//            mTextView.setText(String.format("X : %f\nY : %f\nZ : %f" , x, y, z));
         }
 
     }
