@@ -27,11 +27,16 @@ public class UploadTask extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... params) {
 
         // 使用するサーバーのURLに合わせる
+
+
+//        仮想デバイスから開発pcにアクセス
 //        String urlSt = "http://10.0.2.2:3000/public";
 
 //        String urlSt = "http://192.168.11.3:3000/public";
+        String urlSt = "http://192.168.1.10:3000/public";
 
-        String urlSt = "http://192.168.50.208:3000/public";
+
+//        String urlSt = "http://192.168.50.208:3000/public";
 
 //        String urlSt = "http://httpbin.org/post";
 

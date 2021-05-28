@@ -1,9 +1,11 @@
 <resources>
-    <string name="app_name">FirstWatchApp</string>
+    <string name="app_name">加速度データ収集アプリ</string>
     <!--
     This string is used for square devices and overridden by hello_world in
     values-round/strings.xml for round devices.
     -->
     <string name="hello_world">Hello Square World!</string>
-    <string name="title">加速度計測app</string>
+    <string name="startButton">計測開始</string>
+    <string name="stopButton">計測終了</string>
+
 </resources>
